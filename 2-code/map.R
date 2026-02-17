@@ -91,11 +91,16 @@ baseplot =
           legend.key = element_rect(fill = "transparent"), 
           legend.position = c(0.85, 0.1),
           axis.text = element_blank()) + 
+  geom_point(data = sites, 
+             aes(lon, lat),
+             size = 2, color = "black")+
   cowplot::theme_map() + 
   labs(x = "", y = "")+
-    scale_fill_manual(values = pnw_palette("Bay", 20))+
-    NULL   
-  
+  scale_fill_manual(values = pnw_palette("Bay", 20))+
+  #scale_fill_manual(values = whistledown_palette("featherington", 20))+
+  scale_fill_manual(values = microViz::distinct_palette(n = 20, pal = "kelly"))+
+  NULL   
+
   
 usa = 
   baseplot + 
@@ -119,7 +124,7 @@ hi =
 usa + 
   annotation_custom(
     ggplotGrob(ak), 
-    xmin = -130, xmax = -115, ymin = 15, ymax = 35)+
+    xmin = -130, xmax = -110, ymin = 10, ymax = 40)+
   annotation_custom(
     ggplotGrob(hi), 
     xmin = -115, xmax = -100, ymin = 12, ymax = 32)+
