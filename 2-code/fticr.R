@@ -266,6 +266,7 @@ rel_abundance =
                 relabund = 100 * count/total,
                 relabund = round(relabund, 2)
   ) %>% 
+  mutate(Core_Section = factor(Core_Section, levels = c("TOP", "BTM"))) %>% 
   ungroup()
 
 rel_abundance %>% 
