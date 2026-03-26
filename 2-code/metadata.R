@@ -1,29 +1,5 @@
 
-library(tidyverse)
-
-metadata = read.csv("1-data/metadata/metadata_MONet.csv")
-
-metadata_summary = 
-  metadata %>% 
-  distinct(Proposal_ID, Sampling_Set, call) %>% 
-  group_by(Proposal_ID, Sampling_Set) %>% 
-  dplyr::mutate(n = n())
-
-
-
-
-# -------------------------------------------------------------------------
-
-
-library(tidyverse)
-library(googlesheets4)
-
-metadata = read.csv("1-data/metadata/combined_validated 2.csv")
-
-
-## fy23_list = read_sheet("https://docs.google.com/spreadsheets/d/1lo1NsVQpwvkheYTpuCis_-2esBCWjjlVmyrfZOQpKD0/", sheet = "Core Receiving") %>% dplyr::select(sample_ID)
-## fy24_list = read_sheet("https://docs.google.com/spreadsheets/d/1Y-4DhAw1LI8qbMIw2g2oN_DRrKvIEkFFShmUvrmofSc", sheet = "Core Receiving") %>% dplyr::select(sample_ID)
-## fy25_list = read_sheet("https://docs.google.com/spreadsheets/d/17xHkGiXGloOuN_u5aMTEoxoxeOGMG8ztC5A5_lOUN9A/", sheet = "Core Receiving") %>% dplyr::select(sample_ID)
+metadata = read.csv("1-data/metadata/old/combined_validated 2.csv")
 
 googledrive::drive_download("https://docs.google.com/spreadsheets/d/1EUDwUb5jcAq6IRaDNLf9oPmM5qQGbZHL/edit?gid=722708517#gid=722708517")
 
@@ -74,7 +50,8 @@ metadata_with_year_only_61049_61558 =
 metadata_final = 
   metadata_with_year_without_61049_61558 %>% 
   bind_rows(metadata_with_year_only_61049_61558) %>% 
-  dplyr::select(call, Proposal_ID, Sampling_Set, lat_lon, geo_loc_name, soil_type, fao_class, cur_vegetation, ecoregion, cur_land_use)
+  dplyr::select(call, Proposal_ID, Sampling_Set, lat_lon, geo_loc_name, soil_type, fao_class, cur_vegetation, ecoregion, cur_land_use) %>% 
+  distinct()
 
 metadata_final %>% write.csv("1-data/metadata/metadata_MONet_FY23_FY24_FY25_FY26.csv", row.names = F, na = "")
 
