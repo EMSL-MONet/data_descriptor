@@ -1,7 +1,8 @@
 ---
 title: "Data Descriptor - Manuscript Figures"
-output: html_document
-date: "2026-03-25"
+output:
+  github_document:
+    html_preview: true
 ---
 
 ```{r setup, include=FALSE}
@@ -593,7 +594,7 @@ cowplot::plot_grid(gg_vankrev_unique + theme(legend.position = "none"),
 
 ## HYPROP
 
-```{r}
+```{r hyprop}
 
 options(scipen = 9999)
 hyprop_params = read.csv("1-data/L1_Hyprop_Processed_Mastersheet.csv")
