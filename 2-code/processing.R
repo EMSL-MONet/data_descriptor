@@ -1,6 +1,6 @@
 
 
-metadata = read.csv("1-data/metadata/metadata_MONet.csv")
+metadata = read.csv("1-data/metadata/metadata_MONet_FY23_FY24_FY25_FY26.csv")
 
 
 
@@ -80,7 +80,7 @@ metadata_columns %>%
   dplyr::summarise(n = n()) %>% 
   ggplot(aes(x = soil_type, y = n, fill = call))+
   geom_bar(stat = "identity")+
-  scale_fill_manual(values = soil_palette("redox2", 3))+
+  scale_fill_manual(values = soil_palette("redox2", 4))+
   labs(x = "
        Soil Order",
        y = "count")
