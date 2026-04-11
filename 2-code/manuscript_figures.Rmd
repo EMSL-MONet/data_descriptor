@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Data Descriptor - Manuscript Figures"
 output: html_document
 date: "2026-03-25"
 ---
@@ -104,6 +104,7 @@ sites = metadata %>%
 baseplot =   
   ggplot() + 
   geom_sf(data = neonDomains, color = "black", aes(fill = domainName), show.legend = F, alpha = 0.5) + 
+  geom_sf_text(data = neonDomains, color = "black", aes(label = domainID), fill = NA)+
   theme(legend.background = element_rect(fill = alpha("white", 0.0)), 
         legend.key = element_rect(fill = "transparent"), 
         legend.position = c(0.85, 0.1),
@@ -157,16 +158,17 @@ gg_soil_orders =
   group_by(call, soil_type) %>% 
   dplyr::summarise(n = n()) %>% 
   ggplot(aes(x = soil_type, y = n, fill = call))+
-  geom_bar(stat = "identity")+
-  scale_fill_manual(values = soil_palette("redox2", 5))+
+  geom_bar(stat = "identity", color= "black")+
+  scale_fill_manual(values = soil_palette("redox2", 7))+
+#  scale_fill_manual(values = whistledown_palette("queen", 4))+
   labs(x = "
        Soil Order",
        y = "count")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14))
 
 ```
 
-```{r map_soil_orders}
+```{r map_soil_orders, fig.height=16, fig.width=12}
 
 cowplot::plot_grid(gg_map, gg_soil_orders, nrow = 2,
                    labels = c("A", "B"),
@@ -217,15 +219,32 @@ number_sampling_sets %>%
 total sampling sets = `r total_sampling_sets`
 
 
+```{r, summary_by_orders}
+
+print("summary by soil orders")
+
+summary_by_order = 
+  metadata_columns %>% 
+  filter(call != "1000Soils") %>% 
+  distinct(call, Proposal_ID, Sampling_Set, soil_type) %>% 
+  group_by(soil_type) %>% 
+  dplyr::summarise(n = n(),
+                   percent = 100 * n/total_sampling_sets,
+                   percent = round(percent, 1)) 
+
+summary_by_order %>% 
+  knitr::kable()
+
+
+```
+
+
 
 ---
 
 ## BGC data
 
-```{r}
-
-
-
+```{r bgc, fig.height=10, fig.width=8}
 
 gg_ph = 
   bgc %>% 
@@ -234,7 +253,9 @@ gg_ph =
   geom_jitter(width = 0.1, size = 0.5)+
   labs(x = "",
        y = "pH 
-       ")
+       ")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14))
+
 
 
 gg_weom = 
@@ -245,7 +266,9 @@ gg_weom =
   labs(x = "",
        y = "Water Extractable 
        Organic Carbon (mg/kg)
-       ")
+       ")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14))
+
   
 cowplot::plot_grid(gg_ph, gg_weom, nrow = 2, align = "hv", labels = c("A", "B"))
 
@@ -257,7 +280,7 @@ cowplot::plot_grid(gg_ph, gg_weom, nrow = 2, align = "hv", labels = c("A", "B"))
 ## FTICR
 
 
-```{r}
+```{r icr_processing}
 
 ## fticr processing
 
@@ -442,6 +465,14 @@ icr_processed =
 
 
 #
+
+  
+
+```
+
+
+```{r icr_vk}
+
 # Van Krevelens -----------------------------------------------------------
 
 # mod
@@ -484,13 +515,15 @@ rect_label <- geom_label(data = classification,
 
 icr_processed %>% 
   ggplot(aes(x = OC, y = HC, color = Class1))+
-  geom_point()+
+  geom_point(show.legend = F)+
   class_rect+
   rect_label+
   scale_color_manual(values = whistledown_palette("queen", 9))+
   facet_wrap(~Core_Section)
 
+```
 
+```{r icr_unique}
 
 ## unique
 unique = 
@@ -499,7 +532,7 @@ unique =
   dplyr::mutate(n = n())
 
 gg_vankrev_unique = 
-unique %>% 
+  unique %>% 
   filter(n == 2) %>% 
   ggplot(aes(x = OC, y = HC))+
   geom_point(size = 1, color = "grey90", alpha = 0.4)+
@@ -508,15 +541,14 @@ unique %>%
   class_rect+
   rect_label+
   scale_color_manual(values = whistledown_palette("queen", 9))+
+  labs(x = "O/C",
+       y = "H/C")+
   facet_wrap(~Core_Section)+
   NULL
 
+```
 
-
-
-
-
-# -------------------------------------------------------------------------
+```{r icr_relabund}
 
 rel_abundance = 
   icr_processed %>% 
@@ -536,19 +568,26 @@ rel_abundance %>%
   knitr::kable()
 
 gg_relabund = 
-rel_abundance %>% 
+  rel_abundance %>% 
   ggplot(aes(x = Core_Section, y = relabund, fill = Class1)) +
   geom_bar(stat = "identity")+
- # facet_wrap(~Proposal_ID)+
+  labs(x = "",
+       y = "Relative Abundance (%)",
+       fill = "Compund Class")+
+  # facet_wrap(~Proposal_ID)+
   scale_fill_manual(values = whistledown_palette("queen", 9))
 
+```
 
-cowplot::plot_grid(gg_vankrev_unique + theme(legend.position = "none"), gg_relabund + theme(legend.position = "right"), 
+```{r icr_combined, fig.height=7, fig.width=20}
+
+cowplot::plot_grid(gg_vankrev_unique + theme(legend.position = "none"), 
+                   gg_relabund + theme(legend.position = "right"), 
                    rel_widths = c(2, 1), align = "hv", axis = "bt",
                    labels = c("A", "B"))
-  
 
 ```
+
 
 ---
 
@@ -570,20 +609,30 @@ x_all = c(x1, x2, x3, x4)
 
 hyprop_wrc = 
   cross_join(hyprop_params, x_all, copy = T) %>% 
-  filter(Proposal_ID == "61389") %>% 
-  filter(Sampling_Set %in% c(3, 21, 24)) %>% 
+#  filter(Proposal_ID == "61389") %>% 
+#  filter(Sampling_Set %in% c(3, 21, 24)) %>% 
   rename(h = y) %>% 
   mutate(m = 1 - (1/n),
-         theta = theta_r + (theta_s - theta_r) / (1 + (alpha * h)**n)**m)
+         theta = theta_r + (theta_s - theta_r) / (1 + (alpha * h)**n)**m,
+         h_MPa = h/10000)
 
+# 1mm = 10Pa
+# 1cm = 100Pa
+# 10cm = 1kPa
+# 10,000cm = 1MPa
 
 hyprop_wrc %>% 
-  filter(Proposal_ID == "61389") %>% 
-  filter(Sampling_Set %in% c(3, 21, 24)) %>% 
-  ggplot(aes(x = h, y = theta, color = as.character(Sampling_Set)))+
-  geom_point()+
-  scale_x_log10(limits = c(0.1, 10^7))+
-  facet_wrap(~Proposal_ID)
+  filter((Proposal_ID == "61389" & 
+            Sampling_Set %in% c(3, 5, 8, 12, 14, 21, 24))) %>% 
+  ggplot(aes(x = h_MPa, y = theta, color = as.character(Sampling_Set)))+
+  #geom_point(show.legend = F)+
+  geom_line(linewidth = 1.5, show.legend = F)+
+  scale_x_log10(limits = c(0.0005, 900))+
+  scale_color_manual(values = whistledown_palette("simon", 7))+
+  labs(x = "Water Potential (MPa)",
+       y = "Water Content (% v/v)")+
+#  facet_wrap(~Proposal_ID)+
+  NULL
 
 ```
 

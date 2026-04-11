@@ -3,6 +3,7 @@ library(magrittr)
 library(PNWColors)
 library(soilpalettes)
 library(googlesheets4)
+library(whistledown)
 
 theme_kp <- function() {  # this for all the elements common across plots
   theme_bw() %+replace%
