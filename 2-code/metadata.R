@@ -23,7 +23,8 @@ metadata_with_year =
   separate(sample_name, sep = "_", into = c("Proposal_ID", "Sampling_Set", "Core"), remove = F) %>% 
   left_join(call_list, by = c("Proposal_ID" = "Project_ID")) %>% 
   dplyr::select(call, everything()) %>% 
-  filter(Core == "A")
+#  filter(Core == "B") %>% 
+  force()
 
 metadata_with_year_without_61049_61558 = 
   metadata_with_year %>% 
@@ -50,7 +51,23 @@ metadata_with_year_only_61049_61558 =
 metadata_final = 
   metadata_with_year_without_61049_61558 %>% 
   bind_rows(metadata_with_year_only_61049_61558) %>% 
-  dplyr::select(call, Proposal_ID, Sampling_Set, lat_lon, geo_loc_name, soil_type, fao_class, cur_vegetation, ecoregion, cur_land_use) %>% 
+  dplyr::select(call, Proposal_ID, Sampling_Set, lat_lon, 
+                geo_loc_name, soil_type, fao_class, cur_vegetation, ecoregion, cur_land_use,
+                env_broad_scale) %>% 
+  mutate(env_broad_NEW = str_extract(env_broad_scale, "alpine|aquatic|arid|dense settlement|desert|montane|polar|subalpine|
+                                     subalpine|subtropical|temperate|terrestrial|tropical|village|urban|wetland"),
+         env_broad_NEW = case_when(is.na(env_broad_NEW) & grepl("mediterranean", env_broad_scale) ~ "subtropical",
+                                   is.na(env_broad_NEW) & grepl("freshwater", env_broad_scale) ~ "wetland",
+                                   is.na(env_broad_NEW) &  grepl("shrubland", env_broad_scale) ~ "terrestrial",
+                                   is.na(env_broad_NEW) & grepl("cropland", env_broad_scale) ~ "terrestrial",
+                                   is.na(env_broad_NEW) & grepl("marsh", env_broad_scale) ~ "wetland",
+                                   is.na(env_broad_NEW) & grepl("woodland", env_broad_scale) ~ "terrestrial",
+                                   is.na(env_broad_NEW) & grepl("rangeland", env_broad_scale) ~ "terrestrial",
+                                   is.na(env_broad_NEW) & grepl("peatland", env_broad_scale) ~ "wetland",
+                                   is.na(env_broad_NEW) & grepl("tundra", env_broad_scale) ~ "terrestrial",
+                                   TRUE ~ env_broad_NEW
+                                   )) %>% 
+  mutate(ecoregion = str_replace(ecoregion, "Rockies/", "Rockies /")) %>% 
   distinct()
 
 metadata_final %>% write.csv("1-data/metadata/metadata_MONet_FY23_FY24_FY25_FY26.csv", row.names = F, na = "")
