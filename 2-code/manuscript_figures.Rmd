@@ -110,7 +110,7 @@ baseplot =
         legend.key = element_rect(fill = "transparent"), 
         legend.position = c(0.85, 0.1),
         axis.text = element_blank()) + 
-  geom_point(data = sites, 
+  geom_point(data = sites %>% filter(call != "1000Soils"), 
              aes(lon, lat),
              size = 2, color = "black")+
   cowplot::theme_map() + 
@@ -145,35 +145,147 @@ gg_map =
     xmin = -115, xmax = -100, ymin = 12, ymax = 32)+
   theme_kp()
 
+
+gg_map
 ```
+
+```{r site_counts_ecoregion}
+
+metadata_columns = 
+  metadata %>% 
+#  distinct(call, Proposal_ID, Sampling_Set, ecoregion, soil_type, cur_land_use) %>% 
+  force()
+
+summary_ecoregions = 
+  metadata_columns %>% 
+  filter(call != "1000Soils") %>% 
+  group_by(ecoregion) %>% 
+  dplyr::summarise(n = n()) %>% 
+  full_join(neonDomains %>% dplyr::select(domainID, domainName), by = c("ecoregion" = "domainName")) %>% 
+  dplyr::select(-geometry) %>% 
+#  mutate(n = replace_na(n, 0)) %>% 
+  mutate(label = paste0(domainID, " (", n, ")"))
+
+gg_ecoregion = 
+  summary_ecoregions %>% 
+  #  filter(n > 0) %>% 
+  ggplot(aes(y = reorder(domainID, n), x = n, color = domainID))+
+  geom_segment(aes(yend = reorder(domainID, n), xend = 2.5), linewidth = 12, alpha = 0.5)+
+  geom_text(aes(label = label), 
+            #position = position_nudge(y = -0.4), 
+            hjust = -0.1, size = 6, alpha = 1,
+            #color = "black", 
+            fontface = "bold")+
+  xlim(0, 110)+
+  #  labs(title = "A: Sampling locations by soil type")+
+  #scale_color_manual(values = soil_palette("redox2", 12))+
+  #scale_color_manual(values = whistledown_palette("queen", 17))+
+  scale_color_manual(values = microViz::distinct_palette(n = 20, pal = "kelly"), drop = F)+
+  
+  theme_void()+
+  theme(#axis.text.x = element_text(hjust = 1, size = 14),
+    #axis.text.y = element_blank(),
+    legend.position = "none",
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.background = element_rect(linewidth = 1, color = "black", fill = NA),
+    plot.margin = margin(1, 1, 1, 1))
+
+
+```
+
+
+```{r map_soil_orders, fig.height=16, fig.width=12}
+
+cowplot::plot_grid(gg_map, gg_ecoregion,
+                   nrow = 1,
+                   labels = c("A", "B"),
+                   align = "hv", axis = "tblr", rel_heights = c(1, 1), rel_widths = c(1, 0.6))
+
+```
+
+
 
 ```{r site_counts}
 
 metadata_columns = 
   metadata %>% 
-  distinct(call, Proposal_ID, Sampling_Set, ecoregion, soil_type, cur_land_use)
+#  distinct(call, Proposal_ID, Sampling_Set, ecoregion, soil_type, cur_land_use) %>% 
+  force()
 
-gg_soil_orders = 
+summary_soil_orders = 
   metadata_columns %>% 
   filter(call != "1000Soils") %>% 
-  group_by(call, soil_type) %>% 
+  group_by(soil_type) %>% 
   dplyr::summarise(n = n()) %>% 
-  ggplot(aes(x = soil_type, y = n, fill = call))+
-  geom_bar(stat = "identity", color= "black")+
-  scale_fill_manual(values = soil_palette("redox2", 7))+
-#  scale_fill_manual(values = whistledown_palette("queen", 4))+
-  labs(x = "
-       Soil Order",
-       y = "count")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14))
+  mutate(label = paste0(soil_type, " (", n, ")"))
+
+gg_soil_orders = 
+  summary_soil_orders %>% 
+  ggplot(aes(y = reorder(soil_type, n), x = n, color = soil_type))+
+  geom_segment(aes(yend = reorder(soil_type, n), xend = 2.5), linewidth = 20)+
+  geom_text(aes(label = label), 
+            #position = position_nudge(y = -0.4), 
+            hjust = -0.1, size = 6, alpha = 1,
+            #color = "black", 
+            fontface = "bold")+
+  xlim(0, 200)+
+  labs(title = "A: Sampling locations by soil type
+       ")+
+  #scale_color_manual(values = soil_palette("redox2", 12))+
+  scale_color_manual(values = whistledown_palette("queen", 12))+
+  theme_void()+
+  theme(#axis.text.x = element_text(hjust = 1, size = 14),
+        #axis.text.y = element_blank(),
+        legend.position = "none",
+        plot.title = element_text(size = 16, face = "bold"),
+        plot.background = element_rect(linewidth = 1, color = "black", fill = NA),
+        plot.margin = margin(5, 5, 5, 5))
+
+
+summary_biomes = 
+  metadata_columns %>% 
+  filter(call != "1000Soils") %>% 
+  group_by(env_broad_NEW) %>% 
+  dplyr::summarise(n = n()) %>% 
+    mutate(label = paste0(env_broad_NEW, " (", n, ")"))
+
+gg_biomes = 
+summary_biomes %>% 
+    ggplot(aes(y = reorder(env_broad_NEW, n), x = n, color = env_broad_NEW))+
+  geom_segment(aes(yend = reorder(env_broad_NEW, n), xend = 2.5), linewidth = 20)+
+  geom_text(aes(label = label, x = n), 
+            #position = position_nudge(y = -0.4), 
+            hjust = -0.1, size = 6,
+            #color = "black", 
+            fontface = "bold")+
+  scale_color_manual(values = whistledown_palette("simon", 11))+
+  scale_color_manual(values = pnw_palette("Sailboat", 11))+
+  #scale_color_manual(values = soil_palette("redox2", 11))+
+  #  scale_fill_manual(values = whistledown_palette("queen", 4))+
+  labs(x = "",
+       y = "Count by biome",
+       title = "B: Sampling locations by biome
+       ")+
+  xlim(0, 470)+
+  theme_void()+
+  theme(#axis.text.x = element_text(hjust = 1, size = 14),
+        #axis.text.y = element_blank(),
+        legend.position = "none",
+        plot.title = element_text(size = 16, face = "bold"),
+        plot.background = element_rect(linewidth = 1, color = "black", fill = NA),
+        plot.margin = margin(5, 5, 5, 5))
 
 ```
 
+
+
 ```{r map_soil_orders, fig.height=16, fig.width=12}
 
-cowplot::plot_grid(gg_map, gg_soil_orders, nrow = 2,
-                   labels = c("A", "B"),
-                   align = "hv", axis = "tblr")
+cowplot::plot_grid(gg_soil_orders, gg_biomes,
+                   nrow = 1,
+                   # labels = c("A", "B"),
+                   align = "hv", axis = "tblr",
+                   scale = 0.95)
 
 ```
 
@@ -274,6 +386,47 @@ gg_weom =
 cowplot::plot_grid(gg_ph, gg_weom, nrow = 2, align = "hv", labels = c("A", "B"))
 
 ```
+
+```{r}
+
+bgc_long = 
+  bgc %>% 
+  mutate_all(as.character) %>% 
+  pivot_longer(cols = -c(call, , Sample_Name, Proposal_ID, Sampling_Set, Core_Section)) %>% 
+  mutate(value = as.numeric(value)) %>% 
+  drop_na()
+
+
+  bgc_long %>% 
+    filter(name %in% c("NH4_N_mg_per_kg", "NO3_N_mg_per_kg" )) %>% 
+  ggplot(aes(x = name, y = value))+
+  geom_violin(color = "black")+
+  geom_jitter(width = 0.1, size = 0.5)+
+  labs(x = "",
+#       y = "Water Extractable Organic Carbon (mg/kg)"
+)+
+#    ylim(0, 2500)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14))
+  
+  
+    bgc_long %>% 
+    filter(name %in% c("Ca_meq_per_100g", "Mg_meq_per_100g", "Na_meq_per_100g", "K_meq_per_100g" )) %>% 
+  ggplot(aes(x = name, y = value))+
+  geom_violin(color = "black")+
+  geom_jitter(width = 0.1, size = 0.5)+
+  labs(x = "",
+#       y = "Water Extractable Organic Carbon (mg/kg)"
+)+
+#    ylim(0, 2500)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14))
+
+
+
+```
+
+
+
+
 
 
 ---
