@@ -194,7 +194,7 @@ gg_ecoregion =
 ```
 
 
-```{r map_soil_orders, fig.height=16, fig.width=12}
+```{r map_ecoregion, fig.height=16, fig.width=12}
 
 cowplot::plot_grid(gg_map, gg_ecoregion,
                    nrow = 1,
@@ -228,7 +228,7 @@ gg_soil_orders =
             hjust = -0.1, size = 6, alpha = 1,
             #color = "black", 
             fontface = "bold")+
-  xlim(0, 200)+
+  xlim(0, 300)+
   labs(title = "A: Sampling locations by soil type
        ")+
   #scale_color_manual(values = soil_palette("redox2", 12))+
@@ -266,7 +266,7 @@ summary_biomes %>%
        y = "Count by biome",
        title = "B: Sampling locations by biome
        ")+
-  xlim(0, 470)+
+  xlim(0, 570)+
   theme_void()+
   theme(#axis.text.x = element_text(hjust = 1, size = 14),
         #axis.text.y = element_blank(),
@@ -278,8 +278,7 @@ summary_biomes %>%
 ```
 
 
-
-```{r map_soil_orders, fig.height=16, fig.width=12}
+```{r map_soil_orders, fig.height=10, fig.width=10}
 
 cowplot::plot_grid(gg_soil_orders, gg_biomes,
                    nrow = 1,
@@ -387,44 +386,147 @@ cowplot::plot_grid(gg_ph, gg_weom, nrow = 2, align = "hv", labels = c("A", "B"))
 
 ```
 
-```{r}
+
+### V2
+
+```{r, fig.height=10, fig.width=4}
+# df for raincloud plots
 
 bgc_long = 
   bgc %>% 
+    filter(env_broad_NEW == "temperate") %>% 
   mutate_all(as.character) %>% 
   pivot_longer(cols = -c(call, , Sample_Name, Proposal_ID, Sampling_Set, Core_Section)) %>% 
   mutate(value = as.numeric(value)) %>% 
-  drop_na()
-
-
-  bgc_long %>% 
-    filter(name %in% c("NH4_N_mg_per_kg", "NO3_N_mg_per_kg" )) %>% 
-  ggplot(aes(x = name, y = value))+
-  geom_violin(color = "black")+
-  geom_jitter(width = 0.1, size = 0.5)+
-  labs(x = "",
-#       y = "Water Extractable Organic Carbon (mg/kg)"
-)+
-#    ylim(0, 2500)+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14))
-  
-  
-    bgc_long %>% 
-    filter(name %in% c("Ca_meq_per_100g", "Mg_meq_per_100g", "Na_meq_per_100g", "K_meq_per_100g" )) %>% 
-  ggplot(aes(x = name, y = value))+
-  geom_violin(color = "black")+
-  geom_jitter(width = 0.1, size = 0.5)+
-  labs(x = "",
-#       y = "Water Extractable Organic Carbon (mg/kg)"
-)+
-#    ylim(0, 2500)+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14))
+  drop_na() %>% 
+  mutate(name2 = case_match(name,
+                            "Bulk_density_g_per_cm3" ~ "Bulk Density",
+                            "Total_Carbon_percent" ~ "Total C",
+                            "Total_Nitrogen_percent" ~ "Total N",
+                            "Total_Sulfur_percent" ~ "Total S",
+                            "HClExtOM_TOC_mg_per_kg" ~ "HCl-Ext C",
+                            "HClExtOM_TN_mg_per_kg" ~ "HCl-Ext N",
+                            "WEOM_TOC_mg_per_kg" ~ "H2O-Ext C",
+                            "WEOM_TN_mg_per_kg" ~ "H2O-Ext N",
+                            "SO4_S_mg_per_kg" ~"SO4-S",
+                            "NH4_N_mg_per_kg" ~ "NH4-N",
+                            "NO3_N_mg_per_kg" ~ "NO3-N",
+                            "B_mg_per_kg" ~ "B",
+                            "Zn_mg_per_kg" ~ "Zn",
+                            "Mn_mg_per_kg" ~ "Mn",
+                            "Cu_mg_per_kg" ~ "Cu",
+                            "Fe_mg_per_kg" ~ "Fe",
+                            "MBC_mg_per_kg" ~ "MBC",
+                            "MBN_mg_per_kg" ~ "MBN",
+                            "PO4_P_mg_per_kg" ~ "PO4-P",
+                            "Sand_percent" ~ "Sand",
+                            "Silt_percent" ~ "Silt",
+                            "Clay_percent" ~ "Clay",
+                            "Ca_meq_per_100g" ~ "Ca",
+                            "Mg_meq_per_100g" ~ "Mg", 
+                            "Na_meq_per_100g" ~ "Na", 
+                            "K_meq_per_100g" ~ "K",
+                            "pH" ~ "pH"
+  )) %>% 
+  mutate(data_group = 
+           case_when(name2 %in% c("Ca", "Mg", "Na", "K") ~ "cations",
+                     name2 %in% c("NH4-N", "NO3-N", "PO4-P", "SO4-S") ~ "nutrients",
+                     name2 %in% c("B", "Zn", "Cu", "Fe", "Mn") ~ "micronutrients",
+                     name2 %in% c("Total C", "Total N", "Total S", "pH") ~ "bulk chemistry",
+                     name2 %in% c("H2O-Ext C", "H2O-Ext N", "HCl-Ext C", "HCl-Ext N", "MBC", "MBN") ~ "SOM"))
+                        
 
 
 
 ```
 
+```{r, fig.height=10, fig.width=4}
 
+plot_rainclouds = function(dat){
+  
+  dat %>% 
+#  filter(data_group == "SOM") %>% 
+    filter(! (name2 == "Total S" & value > 0.3)) %>% 
+  filter(! (name2 == "SO4-S" & value > 200)) %>% 
+  filter(! (name2 == "B" & value > 5)) %>% 
+  filter(! (name2 == "MBC" & value > 2500)) %>% 
+  filter(!is.na(data_group)) %>% 
+  ggplot(aes(x = name2, y = value, fill = name2, color = name2))+
+  see::geom_violinhalf(width = 0.5, position = position_nudge(x = 0.2), color = "black")+
+  #geom_violin(width = 0.5, color = "black")+
+#  geom_point(position = position_jitternudge(width = 0.1, nudge.x = 0.8), size = 0.1, color = "black")+
+  geom_jitter(size = 0.1, width = 0.1)+
+  geom_boxplot(width = 0.2, fill = NA, color = "black", outliers = F, 
+               #position = position_nudge(-0.1)
+               )+
+  labs(x = "",
+       y = "",
+       #       y = "Water Extractable Organic Carbon (mg/kg)"
+  )+
+# ggh4x::facet_nested_wrap(~data_group + name2, scales = "free", ncol = 4)+
+    facet_wrap(~name2, scales = "free", ncol = 1,
+               strip.position = "bottom")+
+#scale_y_log10()+
+  theme(
+    plot.background = element_rect(color = "black", linewidth = 1),
+    panel.grid = element_blank(),
+    axis.text.y = element_blank(),
+      legend.position = "none",
+      strip.placement = "outside",
+      panel.border = element_blank(),
+      axis.line.x = element_line(),
+      axis.ticks.y = element_blank())+
+  coord_flip()
+  
+  
+}
+
+plot_rainclouds(bgc_long %>% filter(data_group == "SOM"))
+plot_rainclouds(bgc_long %>% filter(data_group == "bulk chemistry"))  
+plot_rainclouds(bgc_long %>% filter(data_group == "nutrients"))
+plot_rainclouds(bgc_long %>% filter(data_group == "micronutrients"))
+plot_rainclouds(bgc_long %>% filter(data_group == "cations"))
+
+```
+
+
+
+```{r, eval=F}
+
+
+
+
+
+bgc %>% 
+  ggplot(aes(x = Total_Sulfur_percent, y = SO4_S_mg_per_kg, color = Core_Section))+
+  geom_point()
+
+
+x=
+  bgc_long %>%
+  dplyr::select(Sample_Name, name2, value) %>%
+  drop_na() %>% 
+  distinct() %>% 
+  pivot_wider(names_from = "name2") %>% 
+  #  dplyr::select(where(is.numeric)) %>% 
+  plot()
+
+
+(bgc %>% 
+  ggplot(aes(x = Total_Carbon_percent, y = Total_Nitrogen_percent, color = Core_Section))+
+  geom_point() + 
+  geom_smooth(method = "lm", se = F)) %>% 
+  ggMarginal(type = "histogram")
+
+
+(bgc %>% 
+  ggplot(aes(x = Ca_meq_per_100g, y = Mg_meq_per_100g, color = Core_Section))+
+  geom_point() + 
+  geom_smooth(method = "lm", se = F)) %>% 
+  ggMarginal(type = "histogram")
+
+
+```
 
 
 
