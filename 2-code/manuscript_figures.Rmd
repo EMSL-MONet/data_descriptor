@@ -79,8 +79,6 @@ bgc = import_data(FILEPATH = "1-data/bgc_data", PATTERN = "biogeochemistry") %>%
 
 ```
 
-
-
 ---
 
 ## MAP AND SAMPLE COUNT
@@ -94,28 +92,31 @@ neonDomains <- read_sf("NEONDomains_2024", layer="NEON_Domains")
 ## create a df with site coordinates and labels
 sites = metadata %>% 
   separate(lat_lon, sep = ",", into = c("lat", "lon"), remove = F) %>% 
-  dplyr::select(lat, lon, call) %>% 
+  dplyr::select(Proposal_ID, lat, lon, call) %>% 
   mutate(lat = parse_number(lat),
          lon = parse_number(lon))
 
 ```
 
-```{r map_plot}
+```{r map_plot, fig.height=8, fig.width=12}
 
 baseplot =   
   ggplot() + 
-  geom_sf(data = neonDomains, color = "black", aes(fill = domainName), show.legend = F, alpha = 0.5) + 
+  geom_sf(data = neonDomains, color = "black", aes(fill = domainID), show.legend = F, alpha = 0.5, size = 0) + 
   geom_sf_text(data = neonDomains, color = "black", aes(label = domainID), fill = NA)+
   theme(legend.background = element_rect(fill = alpha("white", 0.0)), 
         legend.key = element_rect(fill = "transparent"), 
         legend.position = c(0.85, 0.1),
         axis.text = element_blank()) + 
-  geom_point(data = sites %>% filter(call != "1000Soils"), 
+  geom_point(data = sites %>% filter(call != "1000Soils") %>% filter(Proposal_ID != "61049"), 
              aes(lon, lat),
-             size = 2, color = "black")+
+             size = 4, color = "black")+
+    geom_point(data = sites %>% filter(Proposal_ID == "61049"), 
+             aes(lon, lat),
+             shape = 4, size = 4, color = "black", stroke = 1)+
   cowplot::theme_map() + 
   labs(x = "", y = "")+
-  scale_fill_manual(values = pnw_palette("Bay", 20))+
+  #scale_fill_manual(values = pnw_palette("Bay", 20))+
   #scale_fill_manual(values = whistledown_palette("featherington", 20))+
   scale_fill_manual(values = microViz::distinct_palette(n = 20, pal = "kelly"))+
   NULL   
@@ -149,7 +150,10 @@ gg_map =
 gg_map
 ```
 
-```{r site_counts_ecoregion}
+Note: The points represent all sampling locations (660 entries). NEON sites are marked with "X".
+
+
+```{r site_counts_ecoregion, fig.height=9, fig.width=14}
 
 metadata_columns = 
   metadata %>% 
@@ -164,7 +168,8 @@ summary_ecoregions =
   full_join(neonDomains %>% dplyr::select(domainID, domainName), by = c("ecoregion" = "domainName")) %>% 
   dplyr::select(-geometry) %>% 
 #  mutate(n = replace_na(n, 0)) %>% 
-  mutate(label = paste0(domainID, " (", n, ")"))
+  mutate(label = paste0(domainID, " (", n, ")"),
+         label2 = paste0(domainID, "\n (", n, ")"))
 
 gg_ecoregion = 
   summary_ecoregions %>% 
@@ -191,10 +196,38 @@ gg_ecoregion =
     plot.margin = margin(1, 1, 1, 1))
 
 
+gg_ecoregion2 = 
+  summary_ecoregions %>% 
+#  filter(n > 0) %>% 
+  ggplot(aes(x = reorder(domainID, -n), y = n, color = domainID))+
+  geom_segment(aes(xend = reorder(domainID, -n), yend = 2.5), linewidth = 12, alpha = 0.5)+
+  geom_text(aes(label = label2), 
+            position = position_nudge(y = 5), 
+            #hjust = -0.1, 
+            size = 6, alpha = 1,
+            #color = "black", 
+            fontface = "bold")+
+  ylim(0, 110)+
+  #  labs(title = "A: Sampling locations by soil type")+
+  #scale_color_manual(values = soil_palette("redox2", 12))+
+  #scale_color_manual(values = whistledown_palette("queen", 17))+
+  scale_color_manual(values = microViz::distinct_palette(n = 20, pal = "kelly"), drop = F)+
+  
+  theme_void()+
+  theme(#axis.text.x = element_text(hjust = 1, size = 14),
+    #axis.text.y = element_blank(),
+    legend.position = "none",
+    plot.title = element_text(size = 16, face = "bold"),
+   # plot.background = element_rect(linewidth = 1, color = "black", fill = NA),
+    plot.margin = margin(1, 1, 1, 1))
+
+
+
+
+gg_ecoregion2
 ```
 
-
-```{r map_ecoregion, fig.height=16, fig.width=12}
+```{r map_ecoregion, eval=FALSE, fig.height=16, fig.width=12}
 
 cowplot::plot_grid(gg_map, gg_ecoregion,
                    nrow = 1,
@@ -202,8 +235,6 @@ cowplot::plot_grid(gg_map, gg_ecoregion,
                    align = "hv", axis = "tblr", rel_heights = c(1, 1), rel_widths = c(1, 0.6))
 
 ```
-
-
 
 ```{r site_counts}
 
@@ -277,8 +308,7 @@ summary_biomes %>%
 
 ```
 
-
-```{r map_soil_orders, fig.height=10, fig.width=10}
+```{r site_counts_soils_biomes, fig.height=10, fig.width=10}
 
 cowplot::plot_grid(gg_soil_orders, gg_biomes,
                    nrow = 1,
@@ -287,6 +317,8 @@ cowplot::plot_grid(gg_soil_orders, gg_biomes,
                    scale = 0.95)
 
 ```
+
+--- 
 
 How many sites and cores were sampled?
 
@@ -394,7 +426,7 @@ cowplot::plot_grid(gg_ph, gg_weom, nrow = 2, align = "hv", labels = c("A", "B"))
 
 bgc_long = 
   bgc %>% 
-    filter(env_broad_NEW == "temperate") %>% 
+ #   filter(env_broad_NEW == "temperate") %>% 
   mutate_all(as.character) %>% 
   pivot_longer(cols = -c(call, , Sample_Name, Proposal_ID, Sampling_Set, Core_Section)) %>% 
   mutate(value = as.numeric(value)) %>% 
@@ -436,56 +468,67 @@ bgc_long =
                      name2 %in% c("H2O-Ext C", "H2O-Ext N", "HCl-Ext C", "HCl-Ext N", "MBC", "MBN") ~ "SOM"))
                         
 
-
+bgc_counts = 
+  bgc_long %>% 
+  group_by(data_group, name, name2) %>% 
+  dplyr::summarise(sum = n(),
+                   median = median(value))
 
 ```
 
 ```{r, fig.height=10, fig.width=4}
 
-plot_rainclouds = function(dat){
+plot_rainclouds = function(DATA, COUNTS){
   
-  dat %>% 
-#  filter(data_group == "SOM") %>% 
+  DATA %>% 
     filter(! (name2 == "Total S" & value > 0.3)) %>% 
-  filter(! (name2 == "SO4-S" & value > 200)) %>% 
-  filter(! (name2 == "B" & value > 5)) %>% 
-  filter(! (name2 == "MBC" & value > 2500)) %>% 
-  filter(!is.na(data_group)) %>% 
-  ggplot(aes(x = name2, y = value, fill = name2, color = name2))+
-  see::geom_violinhalf(width = 0.5, position = position_nudge(x = 0.2), color = "black")+
-  #geom_violin(width = 0.5, color = "black")+
-#  geom_point(position = position_jitternudge(width = 0.1, nudge.x = 0.8), size = 0.1, color = "black")+
-  geom_jitter(size = 0.1, width = 0.1)+
-  geom_boxplot(width = 0.2, fill = NA, color = "black", outliers = F, 
-               #position = position_nudge(-0.1)
-               )+
-  labs(x = "",
-       y = "",
-       #       y = "Water Extractable Organic Carbon (mg/kg)"
-  )+
-# ggh4x::facet_nested_wrap(~data_group + name2, scales = "free", ncol = 4)+
+    filter(! (name2 == "SO4-S" & value > 200)) %>% 
+    filter(! (name2 == "B" & value > 5)) %>% 
+    filter(! (name2 == "MBC" & value > 2500)) %>% 
+    filter(!is.na(data_group)) %>% 
+    ggplot(aes(x = name2, y = value, fill = name2, color = name2))+
+    see::geom_violinhalf(width = 0.5, position = position_nudge(x = 0.2), color = "black")+
+    geom_jitter(size = 0.1, width = 0.1)+
+    geom_boxplot(width = 0.2, fill = NA, color = "black", outliers = F)+
+    geom_text(data = COUNTS, aes(y = median, label = paste("n =", sum)), color = "black",
+              position = position_nudge(-0.3), hjust = 0, size = 4)+
+    labs(x = "",
+         y = "")+
     facet_wrap(~name2, scales = "free", ncol = 1,
                strip.position = "bottom")+
-#scale_y_log10()+
-  theme(
-    plot.background = element_rect(color = "black", linewidth = 1),
-    panel.grid = element_blank(),
-    axis.text.y = element_blank(),
+    #scale_y_log10()+
+    theme(
+      plot.background = element_rect(color = "black", linewidth = 1),
+      panel.grid = element_blank(),
+      axis.text.y = element_blank(),
       legend.position = "none",
       strip.placement = "outside",
       panel.border = element_blank(),
       axis.line.x = element_line(),
       axis.ticks.y = element_blank())+
-  coord_flip()
-  
+    coord_flip()
   
 }
 
-plot_rainclouds(bgc_long %>% filter(data_group == "SOM"))
-plot_rainclouds(bgc_long %>% filter(data_group == "bulk chemistry"))  
-plot_rainclouds(bgc_long %>% filter(data_group == "nutrients"))
-plot_rainclouds(bgc_long %>% filter(data_group == "micronutrients"))
-plot_rainclouds(bgc_long %>% filter(data_group == "cations"))
+```
+
+```{r, fig.height=12, fig.width=4}
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "SOM"), COUNTS = bgc_counts %>% filter(data_group == "SOM"))
+
+```
+
+```{r, fig.height=8, fig.width=4}
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "bulk chemistry"), COUNTS = bgc_counts %>% filter(data_group == "bulk chemistry"))
+
+```
+
+```{r, fig.height=8, fig.width=4}
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "nutrients"), COUNTS = bgc_counts %>% filter(data_group == "nutrients"))
+
+```
+
+```{r, fig.height=10, fig.width=4}
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "cations"), COUNTS = bgc_counts %>% filter(data_group == "cations"))
 
 ```
 

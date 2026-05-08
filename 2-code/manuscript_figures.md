@@ -5,6 +5,13 @@ Data Descriptor - Manuscript Figures
 
 ## MAP AND SAMPLE COUNT
 
+![](manuscript_figures_files/figure-gfm/map_plot-1.png)<!-- -->
+
+Note: The points represent all sampling locations (660 entries). NEON
+sites are marked with “X”.
+
+![](manuscript_figures_files/figure-gfm/site_counts_ecoregion-1.png)<!-- -->
+
 ![](manuscript_figures_files/figure-gfm/map_soil_orders-1.png)<!-- -->
 
 How many sites and cores were sampled?
@@ -24,27 +31,27 @@ total projects = 65
 
 | call |   n |
 |:-----|----:|
-| FY23 | 145 |
-| FY24 | 206 |
-| FY25 | 145 |
+| FY23 | 146 |
+| FY24 | 213 |
+| FY25 | 147 |
 | FY26 |  63 |
 
-total sampling sets = 559
+total sampling sets = 569
 
     ## [1] "summary by soil orders"
 
 | soil_type  |   n | percent |
 |:-----------|----:|--------:|
-| Alfisol    | 114 |    20.4 |
-| Andisol    |  33 |     5.9 |
-| Aridisol   |  38 |     6.8 |
-| Entisol    |  69 |    12.3 |
-| Gelisol    |  24 |     4.3 |
-| Histosol   |  44 |     7.9 |
-| Inceptisol | 128 |    22.9 |
-| Mollisol   |  59 |    10.6 |
+| Alfisol    | 114 |    20.0 |
+| Andisol    |  33 |     5.8 |
+| Aridisol   |  38 |     6.7 |
+| Entisol    |  72 |    12.7 |
+| Gelisol    |  24 |     4.2 |
+| Histosol   |  44 |     7.7 |
+| Inceptisol | 128 |    22.5 |
+| Mollisol   |  66 |    11.6 |
 | Spodosol   |   6 |     1.1 |
-| Ultisol    |  30 |     5.4 |
+| Ultisol    |  30 |     5.3 |
 | Vertisol   |  14 |     2.5 |
 
 ------------------------------------------------------------------------
@@ -52,6 +59,16 @@ total sampling sets = 559
 ## BGC data
 
 ![](manuscript_figures_files/figure-gfm/bgc-1.png)<!-- -->
+
+### V2
+
+![](manuscript_figures_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+![](manuscript_figures_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+![](manuscript_figures_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+![](manuscript_figures_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ------------------------------------------------------------------------
 
@@ -81,7 +98,7 @@ total sampling sets = 559
 Session Info
 </summary>
 
-Date run: 2026-04-11
+Date run: 2026-05-08
 
     ## R version 4.5.0 (2025-04-11)
     ## Platform: aarch64-apple-darwin20
@@ -94,7 +111,7 @@ Date run: 2026-04-11
     ## locale:
     ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
     ## 
-    ## time zone: America/New_York
+    ## time zone: America/Los_Angeles
     ## tzcode source: internal
     ## 
     ## attached base packages:
@@ -109,35 +126,35 @@ Date run: 2026-04-11
     ## [16] tidyverse_2.0.0    
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] ade4_1.7-23         tidyselect_1.2.1    farver_2.1.2       
-    ##  [4] Biostrings_2.78.0   S7_0.2.0            fastmap_1.2.0      
-    ##  [7] phyloseq_1.54.0     janitor_2.2.1       digest_0.6.37      
-    ## [10] timechange_0.3.0    lifecycle_1.0.5     cluster_2.1.8.1    
-    ## [13] survival_3.8-3      compiler_4.5.0      rlang_1.1.7        
-    ## [16] tools_4.5.0         igraph_2.1.4        yaml_2.3.10        
-    ## [19] data.table_1.17.0   knitr_1.50          labeling_0.4.3     
-    ## [22] bit_4.6.0           classInt_0.4-11     plyr_1.8.9         
-    ## [25] RColorBrewer_1.1-3  KernSmooth_2.23-26  withr_3.0.2        
-    ## [28] BiocGenerics_0.56.0 grid_4.5.0          stats4_4.5.0       
-    ## [31] googledrive_2.1.1   multtest_2.66.0     biomformat_1.38.0  
-    ## [34] e1071_1.7-16        Rhdf5lib_1.32.0     scales_1.4.0       
-    ## [37] iterators_1.0.14    MASS_7.3-65         cli_3.6.5          
-    ## [40] vegan_2.7-1         rmarkdown_2.29      crayon_1.5.3       
-    ## [43] generics_0.1.3      rstudioapi_0.17.1   reshape2_1.4.4     
-    ## [46] tzdb_0.5.0          rhdf5_2.54.1        DBI_1.2.3          
-    ## [49] ape_5.8-1           proxy_0.4-27        splines_4.5.0      
-    ## [52] parallel_4.5.0      cellranger_1.1.0    microViz_0.12.7    
-    ## [55] XVector_0.50.0      vctrs_0.7.1         Matrix_1.7-3       
-    ## [58] jsonlite_2.0.0      IRanges_2.44.0      hms_1.1.3          
-    ## [61] S4Vectors_0.48.0    bit64_4.6.0-1       foreach_1.5.2      
-    ## [64] units_0.8-7         glue_1.8.0          codetools_0.2-20   
-    ## [67] cowplot_1.1.3       stringi_1.8.7       gtable_0.3.6       
-    ## [70] pillar_1.10.2       rhdf5filters_1.22.0 htmltools_0.5.8.1  
-    ## [73] Seqinfo_1.0.0       R6_2.6.1            vroom_1.6.5        
-    ## [76] evaluate_1.0.3      Biobase_2.70.0      lattice_0.22-6     
-    ## [79] snakecase_0.11.1    gargle_1.5.2        class_7.3-23       
-    ## [82] Rcpp_1.1.1          permute_0.9-7       nlme_3.1-168       
-    ## [85] mgcv_1.9-1          xfun_0.53           fs_1.6.6           
-    ## [88] pkgconfig_2.0.3
+    ##  [1] DBI_1.2.3           permute_0.9-7       rlang_1.1.7        
+    ##  [4] ade4_1.7-23         snakecase_0.11.1    e1071_1.7-16       
+    ##  [7] compiler_4.5.0      mgcv_1.9-1          vctrs_0.7.1        
+    ## [10] reshape2_1.4.4      pkgconfig_2.0.3     crayon_1.5.3       
+    ## [13] fastmap_1.2.0       XVector_0.50.0      labeling_0.4.3     
+    ## [16] rmarkdown_2.29      tzdb_0.5.0          microViz_0.12.7    
+    ## [19] bit_4.6.0           xfun_0.53           jsonlite_2.0.0     
+    ## [22] biomformat_1.38.0   rhdf5filters_1.22.0 Rhdf5lib_1.32.0    
+    ## [25] parallel_4.5.0      cluster_2.1.8.1     R6_2.6.1           
+    ## [28] stringi_1.8.7       RColorBrewer_1.1-3  cellranger_1.1.0   
+    ## [31] Rcpp_1.1.1          Seqinfo_1.0.0       iterators_1.0.14   
+    ## [34] knitr_1.50          IRanges_2.44.0      Matrix_1.7-3       
+    ## [37] splines_4.5.0       igraph_2.1.4        timechange_0.3.0   
+    ## [40] tidyselect_1.2.1    rstudioapi_0.17.1   yaml_2.3.10        
+    ## [43] vegan_2.7-1         codetools_0.2-20    lattice_0.22-6     
+    ## [46] plyr_1.8.9          Biobase_2.70.0      withr_3.0.2        
+    ## [49] S7_0.2.0            evaluate_1.0.3      survival_3.8-3     
+    ## [52] units_0.8-7         proxy_0.4-27        Biostrings_2.78.0  
+    ## [55] pillar_1.10.2       phyloseq_1.54.0     KernSmooth_2.23-26 
+    ## [58] foreach_1.5.2       stats4_4.5.0        insight_1.5.0      
+    ## [61] generics_0.1.3      vroom_1.6.5         S4Vectors_0.48.0   
+    ## [64] hms_1.1.3           scales_1.4.0        class_7.3-23       
+    ## [67] glue_1.8.0          janitor_2.2.1       tools_4.5.0        
+    ## [70] see_0.13.0          data.table_1.17.0   fs_1.6.6           
+    ## [73] cowplot_1.1.3       rhdf5_2.54.1        grid_4.5.0         
+    ## [76] ape_5.8-1           nlme_3.1-168        googledrive_2.1.1  
+    ## [79] cli_3.6.5           gargle_1.5.2        gtable_0.3.6       
+    ## [82] digest_0.6.37       BiocGenerics_0.56.0 classInt_0.4-11    
+    ## [85] farver_2.1.2        htmltools_0.5.8.1   multtest_2.66.0    
+    ## [88] lifecycle_1.0.5     bit64_4.6.0-1       MASS_7.3-65
 
 </details>
