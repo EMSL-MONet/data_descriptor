@@ -12,7 +12,9 @@ sites are marked with “X”.
 
 ![](manuscript_figures_files/figure-gfm/site_counts_ecoregion-1.png)<!-- -->
 
-![](manuscript_figures_files/figure-gfm/map_soil_orders-1.png)<!-- -->
+![](manuscript_figures_files/figure-gfm/site_counts_soils_biomes-1.png)<!-- -->
+
+------------------------------------------------------------------------
 
 How many sites and cores were sampled?
 
@@ -62,13 +64,13 @@ total sampling sets = 569
 
 ### V2
 
-![](manuscript_figures_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](manuscript_figures_files/figure-gfm/raincloud_SOM-1.png)<!-- -->
 
-![](manuscript_figures_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](manuscript_figures_files/figure-gfm/raincloud_bulk-1.png)<!-- -->
 
-![](manuscript_figures_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](manuscript_figures_files/figure-gfm/raincloud_nutrients-1.png)<!-- -->
 
-![](manuscript_figures_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](manuscript_figures_files/figure-gfm/raincloud_cations-1.png)<!-- -->
 
 ------------------------------------------------------------------------
 
@@ -98,7 +100,7 @@ total sampling sets = 569
 Session Info
 </summary>
 
-Date run: 2026-05-08
+Date run: 2026-05-11
 
     ## R version 4.5.0 (2025-04-11)
     ## Platform: aarch64-apple-darwin20

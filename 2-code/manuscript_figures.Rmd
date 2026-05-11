@@ -253,7 +253,7 @@ summary_soil_orders =
 gg_soil_orders = 
   summary_soil_orders %>% 
   ggplot(aes(y = reorder(soil_type, n), x = n, color = soil_type))+
-  geom_segment(aes(yend = reorder(soil_type, n), xend = 2.5), linewidth = 20)+
+  geom_segment(aes(yend = reorder(soil_type, n), xend = 2.5), linewidth = 10)+
   geom_text(aes(label = label), 
             #position = position_nudge(y = -0.4), 
             hjust = -0.1, size = 6, alpha = 1,
@@ -283,13 +283,13 @@ summary_biomes =
 gg_biomes = 
 summary_biomes %>% 
     ggplot(aes(y = reorder(env_broad_NEW, n), x = n, color = env_broad_NEW))+
-  geom_segment(aes(yend = reorder(env_broad_NEW, n), xend = 2.5), linewidth = 20)+
+  geom_segment(aes(yend = reorder(env_broad_NEW, n), xend = 2.5), linewidth = 10)+
   geom_text(aes(label = label, x = n), 
             #position = position_nudge(y = -0.4), 
             hjust = -0.1, size = 6,
             #color = "black", 
             fontface = "bold")+
-  scale_color_manual(values = whistledown_palette("simon", 11))+
+  #scale_color_manual(values = whistledown_palette("simon", 11))+
   scale_color_manual(values = pnw_palette("Sailboat", 11))+
   #scale_color_manual(values = soil_palette("redox2", 11))+
   #  scale_fill_manual(values = whistledown_palette("queen", 4))+
@@ -308,7 +308,7 @@ summary_biomes %>%
 
 ```
 
-```{r site_counts_soils_biomes, fig.height=10, fig.width=10}
+```{r site_counts_soils_biomes, fig.height=5, fig.width=10}
 
 cowplot::plot_grid(gg_soil_orders, gg_biomes,
                    nrow = 1,
@@ -505,29 +505,33 @@ plot_rainclouds = function(DATA, COUNTS){
       strip.placement = "outside",
       panel.border = element_blank(),
       axis.line.x = element_line(),
-      axis.ticks.y = element_blank())+
+      axis.ticks.y = element_blank(),
+      panel.spacing.y = unit(2, "lines"), #facet spacing for x axis
+    plot.margin = margin(1, r = 3, 1, 1)
+
+      )+
     coord_flip()
   
 }
 
 ```
 
-```{r, fig.height=12, fig.width=4}
-plot_rainclouds(DATA = bgc_long %>% filter(data_group == "SOM"), COUNTS = bgc_counts %>% filter(data_group == "SOM"))
+```{r raincloud_SOM, fig.height=12, fig.width=5}
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "SOM"), COUNTS = bgc_counts %>% filter(data_group == "SOM")) #+scale_y_log10()
 
 ```
 
-```{r, fig.height=8, fig.width=4}
+```{r raincloud_bulk, fig.height=8, fig.width=5}
 plot_rainclouds(DATA = bgc_long %>% filter(data_group == "bulk chemistry"), COUNTS = bgc_counts %>% filter(data_group == "bulk chemistry"))
 
 ```
 
-```{r, fig.height=8, fig.width=4}
+```{r raincloud_nutrients, fig.height=8, fig.width=5}
 plot_rainclouds(DATA = bgc_long %>% filter(data_group == "nutrients"), COUNTS = bgc_counts %>% filter(data_group == "nutrients"))
 
 ```
 
-```{r, fig.height=10, fig.width=4}
+```{r raincloud_cations, fig.height=10, fig.width=5}
 plot_rainclouds(DATA = bgc_long %>% filter(data_group == "cations"), COUNTS = bgc_counts %>% filter(data_group == "cations"))
 
 ```
