@@ -217,18 +217,19 @@ rect_label <- geom_label(data = classification,
                              y = label_y,
                              label = Class),
                          inherit.aes = FALSE,
-                         size = 4)
+                         size = 6)
 
 
 
-icr_processed %>% 
+gg_vk_all_points = 
+  icr_processed %>% 
   ggplot(aes(x = OC, y = HC, color = Class1))+
   geom_point()+
   class_rect+
   rect_label+
   scale_color_manual(values = whistledown_palette("queen", 9))+
-  facet_wrap(~Core_Section)
-
+  facet_wrap(~Core_Section)+
+  theme(legend.position = "none")
 
 
 ## unique
@@ -238,23 +239,22 @@ unique =
   dplyr::mutate(n = n())
 
 gg_vankrev_unique = 
-unique %>% 
+  unique %>% 
   filter(n == 2) %>% 
   ggplot(aes(x = OC, y = HC))+
-  geom_point(size = 1, color = "grey90", alpha = 0.4)+
-  geom_point(data = unique %>% filter(n == 1), size = 1, aes(color = Class1))+
+  geom_point(size = 2, color = "grey90", alpha = 0.4)+
+  geom_point(data = unique %>% filter(n == 1), size = 2, aes(color = Class1))+
   
   class_rect+
   rect_label+
   scale_color_manual(values = whistledown_palette("queen", 9))+
+  labs(x = "O/C",
+       y = "H/C")+
   facet_wrap(~Core_Section)+
+  theme(legend.position = "none")+
   NULL
 
-
-
-
-
-
+#
 # -------------------------------------------------------------------------
 
 rel_abundance = 
@@ -279,10 +279,20 @@ rel_abundance %>%
   ggplot(aes(x = Core_Section, y = relabund, fill = Class1)) +
   geom_bar(stat = "identity")+
  # facet_wrap(~Proposal_ID)+
+  labs(x = "",
+       y = "Relative Contribution (%)",
+       fill = "")+
   scale_fill_manual(values = whistledown_palette("queen", 9))
 
 
 cowplot::plot_grid(gg_vankrev_unique + theme(legend.position = "none"), gg_relabund + theme(legend.position = "right"), 
                    rel_widths = c(2, 1), align = "hv", axis = "bt",
                    labels = c("A", "B"))
-  
+
+
+cowplot::plot_grid(gg_vankrev_unique + theme(legend.position = "none"), (gg_relabund  + coord_flip() + theme(legend.position = "bottom")), 
+                   ncol = 1,
+                   #rel_widths = c(2, 1), 
+                   rel_heights = c(2, 1),
+                   align = "hv", axis = "bt",
+                   labels = c("A", "B"))
