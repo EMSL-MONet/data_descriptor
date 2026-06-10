@@ -388,7 +388,7 @@ summary_by_order %>%
 
 ## BGC data
 
-```{r bgc, fig.height=10, fig.width=8}
+```{r bgc, fig.height=10, fig.width=8, eval=FALSE}
 
 gg_ph = 
   bgc %>% 
@@ -424,6 +424,44 @@ cowplot::plot_grid(gg_ph, gg_weom, nrow = 2, align = "hv", labels = c("A", "B"))
 ```{r, fig.height=10, fig.width=4}
 # df for raincloud plots
 
+
+## set names and groups
+data_groups = 
+  tribble(
+    ~data_group, ~name, ~name2, 
+    "bulk density", "Bulk_density_g_per_cm3", "Bulk Density (g/cm3)",
+    "bulk chemistry", "Total_Carbon_percent", "Total C (%)",
+    "bulk chemistry", "Total_Nitrogen_percent", "Total N (%)",
+    "bulk chemistry", "Total_Sulfur_percent", "Total S (%)",
+    "bulk chemistry", "pH", "pH",
+    "SOM", "HClExtOM_TOC_mg_per_kg", "HCl-Ext C (mg/kg)",
+    "SOM", "HClExtOM_TN_mg_per_kg", "HCl-Ext N (mg/kg)",
+    "SOM", "WEOM_TOC_mg_per_kg", "H2O-Ext C (mg/kg)",
+    "SOM", "WEOM_TN_mg_per_kg", "H2O-Ext N (mg/kg)",
+    "SOM", "MBC_mg_per_kg", "MBC (mg/kg)",
+    "SOM", "MBN_mg_per_kg", "MBN (mg/kg)",
+    "nutrients", "SO4_S_mg_per_kg","SO4-S (mg/kg)",
+    "nutrients", "NH4_N_mg_per_kg", "NH4-N (mg/kg)",
+    "nutrients", "NO3_N_mg_per_kg", "NO3-N (mg/kg)",
+    "nutrients", "PO4_P_mg_per_kg", "PO4-P (mg/kg)",
+    "micronutrients", "B_mg_per_kg", "B (mg/kg)",
+    "micronutrients", "Zn_mg_per_kg", "Zn (mg/kg)",
+    "micronutrients", "Mn_mg_per_kg", "Mn (mg/kg)",
+    "micronutrients", "Cu_mg_per_kg", "Cu (mg/kg)",
+    "micronutrients", "Fe_mg_per_kg", "Fe (mg/kg)",
+    "texture", "Sand_percent", "Sand (%)",
+    "texture", "Silt_percent", "Silt (%)",
+    "texture", "Clay_percent", "Clay (%)",
+    "cations", "Ca_meq_per_100g", "Ca (meq/100g)",
+    "cations", "Mg_meq_per_100g", "Mg (meq/100g)", 
+    "cations", "Na_meq_per_100g", "Na (meq/100g)", 
+    "cations", "K_meq_per_100g", "K (meq/100g)"
+  )
+
+
+
+
+
 bgc_long = 
   bgc %>% 
  #   filter(env_broad_NEW == "temperate") %>% 
@@ -431,42 +469,7 @@ bgc_long =
   pivot_longer(cols = -c(call, , Sample_Name, Proposal_ID, Sampling_Set, Core_Section)) %>% 
   mutate(value = as.numeric(value)) %>% 
   drop_na() %>% 
-  mutate(name2 = case_match(name,
-                            "Bulk_density_g_per_cm3" ~ "Bulk Density",
-                            "Total_Carbon_percent" ~ "Total C",
-                            "Total_Nitrogen_percent" ~ "Total N",
-                            "Total_Sulfur_percent" ~ "Total S",
-                            "HClExtOM_TOC_mg_per_kg" ~ "HCl-Ext C",
-                            "HClExtOM_TN_mg_per_kg" ~ "HCl-Ext N",
-                            "WEOM_TOC_mg_per_kg" ~ "H2O-Ext C",
-                            "WEOM_TN_mg_per_kg" ~ "H2O-Ext N",
-                            "SO4_S_mg_per_kg" ~"SO4-S",
-                            "NH4_N_mg_per_kg" ~ "NH4-N",
-                            "NO3_N_mg_per_kg" ~ "NO3-N",
-                            "B_mg_per_kg" ~ "B",
-                            "Zn_mg_per_kg" ~ "Zn",
-                            "Mn_mg_per_kg" ~ "Mn",
-                            "Cu_mg_per_kg" ~ "Cu",
-                            "Fe_mg_per_kg" ~ "Fe",
-                            "MBC_mg_per_kg" ~ "MBC",
-                            "MBN_mg_per_kg" ~ "MBN",
-                            "PO4_P_mg_per_kg" ~ "PO4-P",
-                            "Sand_percent" ~ "Sand",
-                            "Silt_percent" ~ "Silt",
-                            "Clay_percent" ~ "Clay",
-                            "Ca_meq_per_100g" ~ "Ca",
-                            "Mg_meq_per_100g" ~ "Mg", 
-                            "Na_meq_per_100g" ~ "Na", 
-                            "K_meq_per_100g" ~ "K",
-                            "pH" ~ "pH"
-  )) %>% 
-  mutate(data_group = 
-           case_when(name2 %in% c("Ca", "Mg", "Na", "K") ~ "cations",
-                     name2 %in% c("NH4-N", "NO3-N", "PO4-P", "SO4-S") ~ "nutrients",
-                     name2 %in% c("B", "Zn", "Cu", "Fe", "Mn") ~ "micronutrients",
-                     name2 %in% c("Total C", "Total N", "Total S", "pH") ~ "bulk chemistry",
-                     name2 %in% c("H2O-Ext C", "H2O-Ext N", "HCl-Ext C", "HCl-Ext N", "MBC", "MBN") ~ "SOM"))
-                        
+  left_join(data_groups)
 
 bgc_counts = 
   bgc_long %>% 
@@ -481,22 +484,18 @@ bgc_counts =
 plot_rainclouds = function(DATA, COUNTS){
   
   DATA %>% 
-    filter(! (name2 == "Total S" & value > 0.3)) %>% 
-    filter(! (name2 == "SO4-S" & value > 200)) %>% 
-    filter(! (name2 == "B" & value > 5)) %>% 
-    filter(! (name2 == "MBC" & value > 2500)) %>% 
-    filter(!is.na(data_group)) %>% 
-    ggplot(aes(x = name2, y = value, fill = name2, color = name2))+
+ #   filter(!is.na(data_group)) %>% 
+    ggplot(aes(x = name, y = value, fill = name, color = name))+
     see::geom_violinhalf(width = 0.5, position = position_nudge(x = 0.2), color = "black")+
-    geom_jitter(size = 0.1, width = 0.1)+
-    geom_boxplot(width = 0.2, fill = NA, color = "black", outliers = F)+
+    geom_jitter(width = 0.1)+
+    geom_boxplot(width = 0.2, fill = NA, color = "black", outliers = F)+#
     geom_text(data = COUNTS, aes(y = median, label = paste("n =", sum)), color = "black",
               position = position_nudge(-0.3), hjust = 0, size = 4)+
     labs(x = "",
          y = "")+
-    facet_wrap(~name2, scales = "free", ncol = 1,
+    facet_wrap(~name, scales = "free", ncol = 1,
                strip.position = "bottom")+
-    #scale_y_log10()+
+    scale_y_log10()+
     theme(
       plot.background = element_rect(color = "black", linewidth = 1),
       panel.grid = element_blank(),
@@ -517,25 +516,36 @@ plot_rainclouds = function(DATA, COUNTS){
 ```
 
 ```{r raincloud_SOM, fig.height=12, fig.width=5}
-plot_rainclouds(DATA = bgc_long %>% filter(data_group == "SOM"), COUNTS = bgc_counts %>% filter(data_group == "SOM")) #+scale_y_log10()
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "SOM"), COUNTS = bgc_counts %>% filter(data_group == "SOM"))+ 
+#  scale_fill_manual(values = pnw_palette("Starfish", 6)) + scale_color_manual(values = pnw_palette("Starfish", 6))+
+  scale_fill_manual(values = whistledown_palette("daphne", 6)) + scale_color_manual(values = whistledown_palette("daphne", 6))
 
 ```
 
 ```{r raincloud_bulk, fig.height=8, fig.width=5}
-plot_rainclouds(DATA = bgc_long %>% filter(data_group == "bulk chemistry"), COUNTS = bgc_counts %>% filter(data_group == "bulk chemistry"))
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "bulk chemistry" & name != "Total_Sulfur_percent"), 
+                COUNTS = bgc_counts %>% filter(data_group == "bulk chemistry" & name != "Total_Sulfur_percent")) + scale_y_continuous()+
+  scale_fill_manual(values = whistledown_palette("daphne", 3)) + scale_color_manual(values = whistledown_palette("daphne", 3))
 
 ```
 
 ```{r raincloud_nutrients, fig.height=8, fig.width=5}
-plot_rainclouds(DATA = bgc_long %>% filter(data_group == "nutrients"), COUNTS = bgc_counts %>% filter(data_group == "nutrients"))
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "nutrients"), COUNTS = bgc_counts %>% filter(data_group == "nutrients")) + scale_y_log10()+
+  scale_fill_manual(values = whistledown_palette("daphne", 4)) + scale_color_manual(values = whistledown_palette("daphne", 4))
 
 ```
 
 ```{r raincloud_cations, fig.height=10, fig.width=5}
-plot_rainclouds(DATA = bgc_long %>% filter(data_group == "cations"), COUNTS = bgc_counts %>% filter(data_group == "cations"))
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "cations"), COUNTS = bgc_counts %>% filter(data_group == "cations"))+
+  scale_fill_manual(values = whistledown_palette("daphne", 4)) + scale_color_manual(values = whistledown_palette("daphne", 4))
 
 ```
 
+```{r raincloud_metals, fig.height=10, fig.width=5}
+plot_rainclouds(DATA = bgc_long %>% filter(data_group == "micronutrients"), COUNTS = bgc_counts %>% filter(data_group == "micronutrients"))+
+    scale_fill_manual(values = whistledown_palette("daphne", 5)) + scale_color_manual(values = whistledown_palette("daphne", 5))
+
+```
 
 
 ```{r, eval=F}
@@ -812,7 +822,7 @@ rect_label <- geom_label(data = classification,
                              y = label_y,
                              label = Class),
                          inherit.aes = FALSE,
-                         size = 4)
+                         size = 6)
 
 
 
@@ -838,7 +848,7 @@ gg_vankrev_unique =
   unique %>% 
   filter(n == 2) %>% 
   ggplot(aes(x = OC, y = HC))+
-  geom_point(size = 1, color = "grey90", alpha = 0.4)+
+  geom_point(size = 2, color = "grey90", alpha = 0.4)+
   geom_point(data = unique %>% filter(n == 1), size = 1, aes(color = Class1))+
   
   class_rect+
@@ -891,6 +901,15 @@ cowplot::plot_grid(gg_vankrev_unique + theme(legend.position = "none"),
 
 ```
 
+```{r icr_combined2, fig.height=10, fig.width=12}
+
+cowplot::plot_grid(gg_vankrev_unique + theme(legend.position = "none"), 
+                   gg_relabund + theme(legend.position = "bottom") + coord_flip(), 
+                   ncol = 1,
+                   rel_heights = c(2, 1), align = "hv", axis = "bt",
+                   labels = c("A", "B"))
+
+```
 
 ---
 
@@ -899,16 +918,19 @@ cowplot::plot_grid(gg_vankrev_unique + theme(legend.position = "none"),
 ```{r hyprop}
 
 options(scipen = 9999)
-hyprop_params = read.csv("1-data/L1_Hyprop_Processed_Mastersheet.csv")
+hyprop_params = read.csv("1-data/L1_Hyprop_Processed_Mastersheet.csv") %>% filter(theta_r == 0)
 
 
-x = runif(2000, min = 10^-4, max = 10^6)
+# x = runif(2000, min = 10^-4, max = 10^6)
+# 
+# x1 = runif(500, min = 10^-4, max = 10)
+# x2 = runif(5000, min = 10, max = 10^3)
+# x3 = runif(5000, min = 10^3, max = 10^5)
+# x4 = runif(5000, min = 10^5, max = 10^8)
+# x_all = c(x1, x2, x3, x4)
 
-x1 = runif(500, min = 10^-4, max = 10)
-x2 = runif(5000, min = 10, max = 10^3)
-x3 = runif(5000, min = 10^3, max = 10^5)
-x4 = runif(5000, min = 10^5, max = 10^8)
-x_all = c(x1, x2, x3, x4)
+x_all = exp(runif(500, min = -1, max = 15))
+
 
 hyprop_wrc = 
   cross_join(hyprop_params, x_all, copy = T) %>% 
@@ -917,7 +939,14 @@ hyprop_wrc =
   rename(h = y) %>% 
   mutate(m = 1 - (1/n),
          theta = theta_r + (theta_s - theta_r) / (1 + (alpha * h)**n)**m,
-         h_MPa = h/10000)
+#         h_MPa = h/1000,
+         h_kPa = h/10,
+h_MPa = h_kPa/1000
+         ) %>% 
+  mutate(Proposal_ID = as.character(Proposal_ID),
+         Sampling_Set = as.character(Sampling_Set),
+         sample_name = paste0(Proposal_ID, "_", Sampling_Set)) %>% 
+  left_join(metadata)
 
 # 1mm = 10Pa
 # 1cm = 100Pa
@@ -926,18 +955,58 @@ hyprop_wrc =
 
 hyprop_wrc %>% 
   filter((Proposal_ID == "61389" & 
-            Sampling_Set %in% c(3, 5, 8, 12, 14, 21, 24))) %>% 
-  ggplot(aes(x = h_MPa, y = theta, color = as.character(Sampling_Set)))+
+            Sampling_Set %in% c(3, 5, 8, 12, 14, 21))) %>% 
+  ggplot(aes(x = h_kPa, y = theta * 100, color = as.character(Sampling_Set)))+
   #geom_point(show.legend = F)+
   geom_line(linewidth = 1.5, show.legend = F)+
-  scale_x_log10(limits = c(0.0005, 900))+
-  scale_color_manual(values = whistledown_palette("simon", 7))+
-  labs(x = "Water Potential (MPa)",
+  scale_x_log10(limits = c(0.5, 1e6),
+                labels = scales::label_log())+
+  scale_color_manual(values = whistledown_palette("penelope", 7))+
+  scale_color_manual(values = pnw_palette("Sailboat", 7))+
+  labs(x = "Water Potential (kPa)",
        y = "Water Content (% v/v)")+
 #  facet_wrap(~Proposal_ID)+
   NULL
 
+
+  ##  hyprop_wrc %>% 
+  ##    mutate(sample_name = paste0(Proposal_ID, "_", Sampling_Set)) %>% 
+  ##    filter(Proposal_ID == c("61258", "61086", "61389", "61257")  
+  ##           #   Sampling_Set %in% c(3, 5, 8, 12, 14, 21))
+  ##           ) %>% 
+  ##    ggplot(aes(x = h_kPa, y = theta * 100, color = as.character(sample_name)))+
+  ##    #geom_point(show.legend = F)+
+  ##    geom_line(linewidth = 1.5, show.legend = T)+
+  ##    scale_x_log10(limits = c(0.01, 1e9),
+  ##                  labels = scales::label_log())+
+  ##  #  scale_color_manual(values = whistledown_palette("penelope", 7))+
+  ##  #  scale_color_manual(values = pnw_palette("Sailboat", 7))+
+  ##    labs(x = "Water Potential (kPa)",
+  ##         y = "Water Content (% v/v)")+
+  ##    facet_wrap(~Proposal_ID)+
+  ##    NULL
+
+
+hyprop_wrc %>% 
+  filter(Proposal_ID == c("61078", "61093", "61257")) %>%  
+#            Sampling_Set %in% c(3, 5, 8, 12, 14, 21))) %>% 
+  ggplot(aes(x = h_kPa, y = theta * 100, color = soil_type, group = sample_name))+
+  #geom_point(show.legend = F)+
+  geom_line(linewidth = 1.5, show.legend = T)+
+  scale_x_log10(limits = c(0.01, 1e7),
+                labels = scales::label_log())+
+#  scale_color_manual(values = whistledown_palette("penelope", 7))+
+#  scale_color_manual(values = pnw_palette("Sailboat", 7))+
+  labs(x = "Water Potential (kPa)",
+       y = "Water Content (% v/v)")+
+#  facet_wrap(~Proposal_ID)+
+  NULL
+
+
+
+
 ```
+
 
 
 ---

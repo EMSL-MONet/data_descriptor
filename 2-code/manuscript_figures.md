@@ -60,8 +60,6 @@ total sampling sets = 569
 
 ## BGC data
 
-![](manuscript_figures_files/figure-gfm/bgc-1.png)<!-- -->
-
 ### V2
 
 ![](manuscript_figures_files/figure-gfm/raincloud_SOM-1.png)<!-- -->
@@ -71,6 +69,8 @@ total sampling sets = 569
 ![](manuscript_figures_files/figure-gfm/raincloud_nutrients-1.png)<!-- -->
 
 ![](manuscript_figures_files/figure-gfm/raincloud_cations-1.png)<!-- -->
+
+![](manuscript_figures_files/figure-gfm/raincloud_metals-1.png)<!-- -->
 
 ------------------------------------------------------------------------
 
@@ -85,11 +85,17 @@ total sampling sets = 569
 
 ![](manuscript_figures_files/figure-gfm/icr_combined-1.png)<!-- -->
 
+![](manuscript_figures_files/figure-gfm/icr_combined2-1.png)<!-- -->
+
 ------------------------------------------------------------------------
 
 ## HYPROP
 
-![](manuscript_figures_files/figure-gfm/hyprop-1.png)<!-- -->
+![](manuscript_figures_files/figure-gfm/hyprop-1.png)<!-- -->![](manuscript_figures_files/figure-gfm/hyprop-2.png)<!-- -->
+
+------------------------------------------------------------------------
+
+## TARGETED REGRESSION PLOTS
 
 ------------------------------------------------------------------------
 
@@ -100,11 +106,11 @@ total sampling sets = 569
 Session Info
 </summary>
 
-Date run: 2026-05-11
+Date run: 2026-06-10
 
     ## R version 4.5.0 (2025-04-11)
     ## Platform: aarch64-apple-darwin20
-    ## Running under: macOS 26.3.2
+    ## Running under: macOS 26.5
     ## 
     ## Matrix products: default
     ## BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
