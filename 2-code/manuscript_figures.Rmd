@@ -62,7 +62,8 @@ import_metadata = function(FILEPATH, PATTERN){
     df <- read_csv(path) %>% mutate_all(as.character)
     df}))
 }
-metadata = import_metadata(FILEPATH = "1-data/metadata", PATTERN = ".csv")
+metadata = import_metadata(FILEPATH = "1-data/metadata", PATTERN = ".csv") %>% 
+  distinct(Proposal_ID, Sampling_Set, .keep_all = T)
 
 # BGC DATA
 import_data = function(FILEPATH, PATTERN){
@@ -92,9 +93,9 @@ neonDomains <- read_sf("NEONDomains_2024", layer="NEON_Domains")
 ## create a df with site coordinates and labels
 sites = metadata %>% 
   separate(lat_lon, sep = ",", into = c("lat", "lon"), remove = F) %>% 
-  dplyr::select(Proposal_ID, lat, lon, call) %>% 
+  dplyr::select(Proposal_ID, Sampling_Set, lat, lon, call) %>% 
   mutate(lat = parse_number(lat),
-         lon = parse_number(lon))
+         lon = parse_number(lon)) 
 
 ```
 
@@ -110,10 +111,10 @@ baseplot =
         axis.text = element_blank()) + 
   geom_point(data = sites %>% filter(call != "1000Soils") %>% filter(Proposal_ID != "61049"), 
              aes(lon, lat),
-             size = 4, color = "black")+
+             size = 2, color = "black", shape = 19)+
     geom_point(data = sites %>% filter(Proposal_ID == "61049"), 
              aes(lon, lat),
-             shape = 4, size = 4, color = "black", stroke = 1)+
+             shape = 4, size = 4, color = "black", stroke = 1.5)+
   cowplot::theme_map() + 
   labs(x = "", y = "")+
   #scale_fill_manual(values = pnw_palette("Bay", 20))+
