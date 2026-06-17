@@ -95,10 +95,6 @@ total sampling sets = 569
 
 ------------------------------------------------------------------------
 
-## TARGETED REGRESSION PLOTS
-
-------------------------------------------------------------------------
-
 ## Session Info
 
 <details>
@@ -106,7 +102,7 @@ total sampling sets = 569
 Session Info
 </summary>
 
-Date run: 2026-06-10
+Date run: 2026-06-16
 
     ## R version 4.5.0 (2025-04-11)
     ## Platform: aarch64-apple-darwin20
