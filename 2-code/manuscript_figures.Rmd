@@ -21,6 +21,8 @@ library(googlesheets4)
 library(whistledown)
 library(sf) # for map
 
+options(scipen = 9999)
+
 ```
 
 ```{r ggplot_theme}
@@ -486,7 +488,7 @@ plot_rainclouds = function(DATA, COUNTS){
   
   DATA %>% 
  #   filter(!is.na(data_group)) %>% 
-    ggplot(aes(x = name, y = value, fill = name, color = name))+
+    ggplot(aes(x = name2, y = value, fill = name, color = name))+
     see::geom_violinhalf(width = 0.5, position = position_nudge(x = 0.2), color = "black")+
     geom_jitter(width = 0.1)+
     geom_boxplot(width = 0.2, fill = NA, color = "black", outliers = F)+#
@@ -494,7 +496,7 @@ plot_rainclouds = function(DATA, COUNTS){
               position = position_nudge(-0.3), hjust = 0, size = 4)+
     labs(x = "",
          y = "")+
-    facet_wrap(~name, scales = "free", ncol = 1,
+    facet_wrap(~name2, scales = "free", ncol = 1,
                strip.position = "bottom")+
     scale_y_log10()+
     theme(
