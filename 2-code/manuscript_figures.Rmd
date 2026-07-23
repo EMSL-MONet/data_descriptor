@@ -921,7 +921,7 @@ cowplot::plot_grid(gg_vankrev_unique + theme(legend.position = "none"),
 ```{r hyprop}
 
 options(scipen = 9999)
-hyprop_params = read.csv("1-data/L1_Hyprop_Processed_Mastersheet.csv") %>% filter(theta_r == 0)
+hyprop_params = read.csv("1-data/HYPROP_FY24_L2_summary.csv")
 
 
 # x = runif(2000, min = 10^-4, max = 10^6)
@@ -941,11 +941,11 @@ hyprop_wrc =
 #  filter(Sampling_Set %in% c(3, 21, 24)) %>% 
   rename(h = y) %>% 
   mutate(m = 1 - (1/n),
-         theta = theta_r + (theta_s - theta_r) / (1 + (alpha * h)**n)**m,
-#         h_MPa = h/1000,
+         theta = theta_r_cm3_per_cm3 + (theta_s_cm3_per_cm3 - theta_r_cm3_per_cm3) / (1 + (alpha_per_cm * h)**n)**m,
+         #         h_MPa = h/1000,
          h_kPa = h/10,
-h_MPa = h_kPa/1000
-         ) %>% 
+         h_MPa = h_kPa/1000
+  ) %>% 
   mutate(Proposal_ID = as.character(Proposal_ID),
          Sampling_Set = as.character(Sampling_Set),
          sample_name = paste0(Proposal_ID, "_", Sampling_Set)) %>% 
